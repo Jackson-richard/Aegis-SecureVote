@@ -1,103 +1,84 @@
-const http = require('http');
+const fs = require('fs');
+const path = require('path');
 
-function request(options, data) {
-    return new Promise((resolve, reject) => {
-        const req = http.request(options, (res) => {
-            let body = '';
-            res.on('data', (chunk) => body += chunk);
-            res.on('end', () => {
-                try {
-                    resolve({ status: res.statusCode, body: JSON.parse(body) });
-                } catch (e) {
-                    resolve({ status: res.statusCode, body });
-                }
-            });
-        });
-        req.on('error', reject);
-        if (data) req.write(JSON.stringify(data));
-        req.end();
-    });
-}
+const API_URL = 'http://localhost:5000';
+const DB_PATH = path.join(__dirname, 'server/data/db.json');
 
-async function verify() {
-    console.log("Starting Verification...");
+async function runVerification() {
+    console.log("🚀 Starting Verification Script...");
 
-    // 1. Register (Randomize username to avoid conflict on re-run)
-    const username = `testvoter_${Date.now()}`;
-    console.log(`1. Registering user '${username}'...`);
-    const regRes = await request({
-        hostname: 'localhost', port: 5000, path: '/api/auth/register', method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-    }, { username: username, password: 'password' });
+    // 1. Read DB to find a valid student and candidate
+    try {
+        const dbRaw = fs.readFileSync(DB_PATH, 'utf-8');
+        const db = JSON.parse(dbRaw);
 
-    if (regRes.status !== 201) {
-        console.error("Registration failed:", regRes.body);
-        process.exit(1);
-    }
-    console.log("Registration success.");
-
-    // 2. Login
-    console.log("2. Logging in...");
-    const loginRes = await request({
-        hostname: 'localhost', port: 5000, path: '/api/auth/login', method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-    }, { username: username, password: 'password' });
-
-    if (loginRes.status !== 200) {
-        console.error("Login failed:", loginRes.body);
-        process.exit(1);
-    }
-    const token = loginRes.body.token;
-    console.log("Login successful. Token received.");
-
-    // 3. Get Candidates (Before Vote)
-    console.log("3. Fetching candidates...");
-    const candidatesRes = await request({
-        hostname: 'localhost', port: 5000, path: '/api/candidates', method: 'GET'
-    });
-    const candidateArg = candidatesRes.body.find(c => c.name === 'Joseph Vijay');
-    if (!candidateArg) {
-        console.error("Candidate 'Joseph Vijay' not found! Candidates:", candidatesRes.body);
-        process.exit(1);
-    }
-    const initialVotes = candidateArg.voteCount;
-    // console.log(`Joseph Vijay currently has ${initialVotes} votes.`);
-
-    // 4. Vote
-    console.log("4. Casting vote for Joseph Vijay...");
-    const voteRes = await request({
-        hostname: 'localhost', port: 5000, path: '/api/vote', method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+        const student = db.students.find(s => !s.used);
+        if (!student) {
+            console.error("❌ No unused students found for testing. Please reset db.json.");
+            return;
         }
-    }, { candidateId: candidateArg.id });
 
-    if (voteRes.status !== 200) {
-        console.error("Voting failed:", voteRes.body);
-        process.exit(1);
-    } else {
-        console.log("Vote cast successfully. Tx Hash:", voteRes.body.transactionHash);
-    }
+        const candidate = db.candidates[0];
 
-    // 5. Verify Count
-    console.log("5. Verifying vote count...");
+        console.log(`👤 Testing with Student: ${student.name} (${student.id})`);
+        console.log(`🗳️ Voting for Candidate: ${candidate.name} (${candidate.id})`);
 
-    // Tiny wait for local blockchain to update (it's usually instant but just in case)
-    await new Promise(r => setTimeout(r, 1000));
+        // 2. Cast Vote
+        console.log("\n📡 Sending Vote Request...");
+        const voteResponse = await fetch(`${API_URL}/api/cast`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                studentId: student.id,
+                token: student.token,
+                candidateId: candidate.id
+            })
+        });
 
-    const checkRes = await request({
-        hostname: 'localhost', port: 5000, path: '/api/candidates', method: 'GET'
-    });
-    const updatedCandidate = checkRes.body.find(c => c.name === 'Joseph Vijay');
-    console.log(`Joseph Vijay now has ${updatedCandidate.voteCount} votes.`);
+        const voteData = await voteResponse.json();
 
-    if (updatedCandidate.voteCount > initialVotes) {
-        console.log("VERIFICATION SUCCESSFUL!");
-    } else {
-        console.error("Vote count did not increase!");
-        process.exit(1);
+        if (voteData.success) {
+            console.log("✅ Vote Cast Successfully!");
+            const proofId = voteData.proofId;
+            console.log(`🔐 Received Proof ID: ${proofId}`);
+
+            if (!proofId) {
+                console.error("❌ Error: No Proof ID returned!");
+                return;
+            }
+
+            // 3. Verify Proof
+            console.log("\n🔍 Verifying Proof...");
+            const verifyResponse = await fetch(`${API_URL}/api/verify/${proofId}`);
+            const verifyData = await verifyResponse.json();
+
+            if (verifyData.valid) {
+                console.log("✅ Proof Verified Successfully!");
+                console.log(`   - Timestamp: ${verifyData.timestamp}`);
+                console.log(`   - Action: ${verifyData.actionType}`);
+            } else {
+                console.error("❌ Proof Verification Failed:", verifyData.message);
+            }
+
+            // 4. Verify Audit Log
+            console.log("\n📜 Checking Audit Log...");
+            const auditResponse = await fetch(`${API_URL}/api/audit-log`);
+            const auditLog = await auditResponse.json();
+            const foundInLog = auditLog.find(l => l.proofId === proofId);
+
+            if (foundInLog) {
+                console.log("✅ Proof found in Audit Log!");
+            } else {
+                console.error("❌ Proof NOT found in Audit Log!");
+            }
+
+        } else {
+            console.error("❌ Vote Failed:", voteData.message);
+        }
+
+    } catch (error) {
+        console.error("❌ Error during verification:", error.message);
     }
 }
 
-verify().catch(console.error);
+runVerification();

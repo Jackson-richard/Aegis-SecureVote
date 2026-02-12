@@ -14,7 +14,7 @@ const artifact = JSON.parse(fs.readFileSync(artifactPath, 'utf8'));
 const abi = artifact.abi;
 
 // Contract Address (Update this after deployment)
-const CONTRACT_ADDRESS = '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707';
+const CONTRACT_ADDRESS = '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0';
 
 const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, wallet);
 

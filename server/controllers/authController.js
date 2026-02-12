@@ -1,30 +1,37 @@
-const jwt = require('jsonwebtoken');
+const dataManager = require('../services/dataManager');
 
-// Mock database
-const users = [];
+exports.verifyQR = (req, res) => {
+    const { studentId, token } = req.body;
+
+    if (!studentId || !token) {
+        return res.status(400).json({ valid: false, message: 'Missing studentId or token' });
+    }
+
+    const db = dataManager.readDB();
+    const student = db.students.find(s => s.id === studentId);
+
+    if (!student) {
+        return res.status(404).json({ valid: false, message: 'Student ID not found' });
+    }
+
+    if (student.token !== token) {
+        return res.status(403).json({ valid: false, message: 'Invalid token' });
+    }
+
+    if (student.used) {
+        return res.status(403).json({ valid: false, message: 'Token already used. You have already voted.' });
+    }
+
+    // Return success and the student name for UI welcome message
+    res.json({ valid: true, message: 'Verified', student: { id: student.id, name: student.name } });
+};
+
+// Keep existing methods as stubs or basic implementations if needed, 
+// but for the demo we focus on QR.
+exports.login = (req, res) => {
+    res.status(501).json({ message: "Use QR Scan for this demo." });
+};
 
 exports.register = (req, res) => {
-    const { username, password } = req.body;
-    if (!username || !password) {
-        return res.status(400).json({ message: 'Username and password are required' });
-    }
-    const existingUser = users.find(u => u.username === username);
-    if (existingUser) {
-        return res.status(400).json({ message: 'User already exists' });
-    }
-    const newUser = { id: users.length + 1, username, password, hasVoted: false };
-    users.push(newUser);
-    res.status(201).json({ message: 'User registered successfully' });
+    res.status(501).json({ message: "Registration disabled for demo." });
 };
-
-exports.login = (req, res) => {
-    const { username, password } = req.body;
-    const user = users.find(u => u.username === username && u.password === password);
-    if (!user) {
-        return res.status(401).json({ message: 'Invalid credentials' });
-    }
-    const token = jwt.sign({ userId: user.id, username: user.username }, 'secret_key', { expiresIn: '1h' });
-    res.json({ token, user: { id: user.id, username: user.username, hasVoted: user.hasVoted } });
-};
-
-exports.getUsers = () => users;

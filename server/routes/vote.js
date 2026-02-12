@@ -1,14 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const voteController = require('../controllers/voteController');
-const authController = require('../controllers/authController');
-const authMiddleware = require('../middleware/authMiddleware');
 
-router.post("/register", authController.register);
-router.post("/login", authController.login);
-router.post('/vote', authMiddleware, voteController.vote);
-router.get('/candidates', voteController.getResults); // Public results
+// Public route for casting vote (Security handled inside controller via Token check)
+router.post('/cast', voteController.castVote);
+router.get('/candidates', voteController.getResults);
 
-
+// Security / Verification Routes
+router.get('/verify/:proofId', voteController.verifyProof);
+router.get('/audit-log', voteController.getAuditLog);
 
 module.exports = router;

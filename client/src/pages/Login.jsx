@@ -1,28 +1,54 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Lock, User } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { ScanLine } from 'lucide-react';
+import QRScanner from '../components/QRScanner';
 
 const Login = () => {
-    const [formData, setFormData] = useState({ username: '', password: '' });
     const [error, setError] = useState('');
+    const [scanning, setScanning] = useState(false);
     const navigate = useNavigate();
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+    const handleScanSuccess = async (decodedData) => {
+        try {
+            // Dynamic base URL
+            const baseUrl = `http://${window.location.hostname}:5000`;
+
+            const { studentId, token } = decodedData;
+
+            if (!studentId || !token) {
+                setError("Invalid QR Code structure");
+                return;
+            }
+
+            const response = await axios.post(`${baseUrl}/api/auth/verify-qr`, {
+                studentId,
+                token
+            });
+
+            if (response.data.valid) {
+                const { student } = response.data;
+                // Store auth data
+                localStorage.setItem('studentId', student.id);
+                localStorage.setItem('token', token); // Use the QR token as the auth token
+                localStorage.setItem('studentName', student.name);
+
+                // Navigate to dashboard/voting
+                navigate('/dashboard');
+            } else {
+                setError(response.data.message || "Verification failed");
+            }
+        } catch (err) {
+            console.error(err);
+            setError(err.response?.data?.message || 'Verification Error');
+        }
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            // Use local IP/port or configure proxy. Vite proxy is best but strict URL for now.
-            const response = await axios.post('http://localhost:5000/api/auth/login', formData);
-            localStorage.setItem('token', response.data.token);
-            localStorage.setItem('user', JSON.stringify(response.data.user));
-            navigate('/dashboard');
-        } catch (err) {
-            setError(err.response?.data?.message || 'Login failed');
+    const handleScanError = (errMsg) => {
+        // Only show critical errors, ignore scan misses
+        if (errMsg === "Invalid QR Format") {
+            setError("QR Code must contain valid Student JSON data");
         }
     };
 
@@ -36,13 +62,13 @@ const Login = () => {
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="relative w-full max-w-md p-8 backdrop-blur-xl bg-gray-900/60 border border-gray-800/50 rounded-2xl shadow-2xl"
+                className="relative w-full max-w-md p-8 backdrop-blur-xl bg-gray-900/60 border border-gray-800/50 rounded-2xl shadow-2xl text-center"
             >
-                <div className="text-center mb-8">
+                <div className="mb-8">
                     <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">
-                        Welcome Back
+                        Secure Vote
                     </h2>
-                    <p className="text-gray-400 mt-2">Sign in to cast your secure vote</p>
+                    <p className="text-gray-400 mt-2">Scan your Identity Token to Vote</p>
                 </div>
 
                 {error && (
@@ -51,46 +77,29 @@ const Login = () => {
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-2">Username</label>
-                        <div className="relative">
-                            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                            <input
-                                type="text"
-                                name="username"
-                                value={formData.username}
-                                onChange={handleChange}
-                                className="w-full bg-gray-950/50 border border-gray-700 text-white pl-10 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all placeholder:text-gray-600"
-                                placeholder="Enter your username"
-                                required
-                            />
+                <div className="bg-black/40 p-4 rounded-xl border border-gray-700/50 min-h-[300px] flex items-center justify-center">
+                    {!scanning ? (
+                        <div className="flex flex-col items-center">
+                            <ScanLine className="w-16 h-16 text-indigo-500 mb-4 animate-pulse" />
+                            <button
+                                onClick={() => setScanning(true)}
+                                className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-full font-semibold transition-all shadow-lg shadow-indigo-500/30"
+                            >
+                                Start Camera
+                            </button>
                         </div>
-                    </div>
+                    ) : (
+                        <QRScanner
+                            onScanSuccess={handleScanSuccess}
+                            onScanError={handleScanError}
+                        />
+                    )}
+                </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-2">Password</label>
-                        <div className="relative">
-                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                            <input
-                                type="password"
-                                name="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                className="w-full bg-gray-950/50 border border-gray-700 text-white pl-10 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all placeholder:text-gray-600"
-                                placeholder="Enter your password"
-                                required
-                            />
-                        </div>
-                    </div>
+                <p className="text-xs text-gray-500 mt-6">
+                    Demo Mode: Ensure you are connected to the campus network.
+                </p>
 
-                    <button
-                        type="submit"
-                        className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-500/20 transition-all transform hover:scale-[1.02]"
-                    >
-                        Sign In
-                    </button>
-                </form>
             </motion.div>
         </div>
     );
