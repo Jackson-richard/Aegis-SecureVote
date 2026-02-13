@@ -57,7 +57,7 @@
     {
       "id": "CSE2024010",
       "token": "TOKEN_KAPPA_707",
-      "used": true,
+      "used": false,
       "name": "Jack Red"
     }
   ],
@@ -70,7 +70,7 @@
       "moto": "Discipline. Progress. Transparency.",
       "department": "CSE",
       "year": "3rd Year",
-      "votes": 1
+      "votes": 0
     },
     {
       "id": 2,
@@ -80,7 +80,7 @@
       "moto": "Green campus, smart future.",
       "department": "ECE",
       "year": "3rd Year",
-      "votes": 1
+      "votes": 0
     },
     {
       "id": 3,
@@ -90,35 +90,23 @@
       "moto": "Innovation for every student.",
       "department": "MECH",
       "year": "4th Year",
-      "votes": 0
+      "votes": 1
     }
   ],
   "votes": [
     {
-      "candidateId": 2,
-      "timestamp": "2026-02-11T20:17:12.018Z",
-      "proofId": "538da3c7b1b8dfee8c0bc61ba8ddee174a8c6da8baa0e3dc2a3b40704d8702ef"
-    },
-    {
-      "candidateId": 1,
-      "timestamp": "2026-02-12T16:20:21.935Z",
-      "proofId": "ea8399247d5538a9948ab385eaff450a7d0037469ed3514cf4a2556326999397"
+      "candidateId": 3,
+      "timestamp": "2026-02-12T17:49:38.676Z",
+      "proofId": "9ed98505da443f53667a5378602b4234ca2991508a5981a58d26094f7fdaa88b"
     }
   ],
   "auditLogs": [
     {
-      "proofId": "538da3c7b1b8dfee8c0bc61ba8ddee174a8c6da8baa0e3dc2a3b40704d8702ef",
-      "timestamp": "2026-02-11T20:17:12.018Z",
+      "proofId": "9ed98505da443f53667a5378602b4234ca2991508a5981a58d26094f7fdaa88b",
+      "timestamp": "2026-02-12T17:49:38.676Z",
       "actionType": "VOTE_CAST",
-      "actionId": "8cbaf267-ee3a-4b71-9dea-f73e3accaeb3",
-      "nonce": "6029b202588820f85e49705510bde9d8"
-    },
-    {
-      "proofId": "ea8399247d5538a9948ab385eaff450a7d0037469ed3514cf4a2556326999397",
-      "timestamp": "2026-02-12T16:20:21.935Z",
-      "actionType": "VOTE_CAST",
-      "actionId": "0c72c154-1e82-4e82-97b0-270dc9aa0f96",
-      "nonce": "6e4804e0d7be7f1b5871f4344003e8a8"
+      "actionId": "d2ea7690-074b-4ce6-b626-ae57770237cb",
+      "walletAddress": "0x5cc101a64B619e01d5eA900E3587F7Ed96293857"
     }
   ]
 }

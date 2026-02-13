@@ -59,8 +59,8 @@ const Verify = () => {
                             type="submit"
                             disabled={loading || !proofId}
                             className={`absolute right-2 top-2 bottom-2 px-6 rounded-lg font-bold transition-all ${loading || !proofId
-                                    ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
-                                    : 'bg-indigo-600 hover:bg-indigo-500 text-white'
+                                ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                                : 'bg-indigo-600 hover:bg-indigo-500 text-white'
                                 }`}
                         >
                             {loading ? 'Verifying...' : 'Verify'}
@@ -90,9 +90,17 @@ const Verify = () => {
                             </div>
                             <div className="flex items-center gap-3 text-sm">
                                 <ShieldCheck className="w-4 h-4 text-gray-400" />
-                                <span className="text-gray-400">Action Type:</span>
                                 <span className="text-white font-mono">{result.actionType}</span>
                             </div>
+                            {result.walletAddress && (
+                                <div className="flex items-center gap-3 text-sm">
+                                    <ShieldCheck className="w-4 h-4 text-gray-400" />
+                                    <span className="text-gray-400">Wallet Auth:</span>
+                                    <span className="text-green-400 font-mono text-xs break-all">
+                                        {result.walletAddress}
+                                    </span>
+                                </div>
+                            )}
                             <div className="flex items-start gap-3 text-sm pt-2">
                                 <span className="text-gray-500 text-xs">Proof ID matches immutable audit log.</span>
                             </div>

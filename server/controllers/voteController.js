@@ -1,17 +1,35 @@
 const crypto = require('crypto');
 const dataManager = require('../services/dataManager');
 
-exports.castVote = (req, res) => {
+exports.castVote = async (req, res) => {
     console.log("------------------------------------------------");
     console.log("VOTE REQUEST RECEIVED");
     console.log("Payload:", JSON.stringify(req.body, null, 2));
 
-    const { studentId, token, candidateId } = req.body;
+    const { studentId, token, candidateId, message: voteMessage, signature, walletAddress } = req.body;
 
     if (!studentId || !token || !candidateId) {
         console.error("❌ Vote rejected: Missing required fields");
         return res.status(400).json({ success: false, message: "Missing required fields" });
     }
+
+    // WALLET VALIDATION
+    if (voteMessage && signature && walletAddress) {
+        try {
+            const ethers = require('ethers');
+            const recoveredAddress = ethers.verifyMessage(voteMessage, signature);
+
+            if (recoveredAddress.toLowerCase() !== walletAddress.toLowerCase()) {
+                console.error("❌ Vote rejected: Signature verification failed");
+                return res.status(403).json({ success: false, message: "Invalid wallet signature" });
+            }
+            console.log(`✅ Wallet Verified: ${walletAddress}`);
+        } catch (err) {
+            console.error("❌ Signature verification error:", err);
+            return res.status(400).json({ success: false, message: "Signature verification failed" });
+        }
+    }
+
 
     const db = dataManager.readDB();
 
@@ -54,8 +72,12 @@ exports.castVote = (req, res) => {
     const timestamp = new Date().toISOString();
 
     // Create SHA-256 hash (Proof ID)
-    // Data included: actionId + timestamp + nonce (NO student ID, NO vote choice)
-    const dataToHash = `${actionId}${timestamp}${nonce}`;
+    // Data included: actionId + timestamp + nonce + walletAddress + signature (NO student ID, NO vote choice)
+    let dataToHash = `${actionId}${timestamp}${nonce}`;
+    if (walletAddress && signature) {
+        dataToHash += `${walletAddress}${signature}`;
+    }
+
     const proofId = crypto.createHash('sha256').update(dataToHash).digest('hex');
 
     console.log(`🔐 Generated Proof ID: ${proofId}`);
@@ -79,7 +101,9 @@ exports.castVote = (req, res) => {
         timestamp: timestamp,
         actionType: "VOTE_CAST",
         actionId: actionId, // Internal tracking
-        nonce: nonce // Needed for re-verification if we ever wanted to implementation that
+        // nonce: nonce // Keeping it out of public log unless needed, but hash verification would need it. 
+        // For this demo, we just store what's needed for the verify page.
+        walletAddress: walletAddress || null
     };
 
     if (!db.auditLogs) {
@@ -118,7 +142,8 @@ exports.verifyProof = (req, res) => {
         res.json({
             valid: true,
             timestamp: record.timestamp,
-            actionType: record.actionType
+            actionType: record.actionType,
+            walletAddress: record.walletAddress
         });
     } else {
         res.json({

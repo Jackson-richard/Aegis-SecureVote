@@ -11,6 +11,9 @@ const Dashboard = () => {
     const [message, setMessage] = useState(null);
     const [hasVoted, setHasVoted] = useState(false);
 
+    const [walletAddress, setWalletAddress] = useState(null);
+    const [isConnecting, setIsConnecting] = useState(false);
+
     // Auth State
     const studentName = localStorage.getItem('studentName');
     const studentId = localStorage.getItem('studentId');
@@ -41,28 +44,68 @@ const Dashboard = () => {
         }
     };
 
-    const handleVote = async (candidateId) => {
-        setVoting(true);
-        setMessage(null);
+    const connectWallet = async () => {
+        if (!window.ethereum) {
+            setMessage({ type: 'error', text: "MetaMask not detected. Please install a wallet to vote." });
+            return;
+        }
+        setIsConnecting(true);
+        try {
+            // Request account access
+            const { ethers } = await import('ethers');
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await provider.getSigner();
+            const address = await signer.getAddress();
+            setWalletAddress(address);
+            setMessage({ type: 'success', text: "Wallet connected! You can now cast your vote." });
+        } catch (err) {
+            console.error("Wallet connection error:", err);
+            setMessage({ type: 'error', text: "Failed to connect wallet." });
+        } finally {
+            setIsConnecting(false);
+        }
+    };
 
+    const handleVote = async (candidateId) => {
+        setMessage(null);
 
         const currentStudentId = localStorage.getItem('studentId');
         const currentToken = localStorage.getItem('token');
 
-        console.log("Attempting vote:", { currentStudentId, candidateId });
-
         if (!currentStudentId || !currentToken) {
             setMessage({ type: 'error', text: 'Authentication missing. Please scan again.' });
-            setVoting(false);
             return;
         }
 
+        if (!walletAddress) {
+            setMessage({ type: 'error', text: 'Please connect your wallet to authorize this vote.' });
+            return;
+        }
+
+        setVoting(true);
+        console.log("Attempting vote:", { currentStudentId, candidateId });
+
         try {
+            // New Security Step: Sign Message
+            const timestamp = new Date().toISOString();
+            const { ethers } = await import('ethers');
+            // Mock nonce for unique message (in real app, get from backend)
+            const nonce = crypto.randomUUID();
+
+            const message = `VOTE_CAST\nstudentId=${currentStudentId}\ncandidateId=${candidateId}\ntimestamp=${timestamp}\nnonce=${nonce}`;
+
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await provider.getSigner();
+            const signature = await signer.signMessage(message);
+
             const baseUrl = `http://${window.location.hostname}:5000`;
             const payload = {
                 studentId: currentStudentId,
                 token: currentToken,
-                candidateId
+                candidateId,
+                message: message, // Send the original message so backend can verify
+                signature: signature,
+                walletAddress: walletAddress
             };
 
             console.log("Sending payload:", payload);
@@ -84,11 +127,16 @@ const Dashboard = () => {
 
         } catch (error) {
             console.error("Vote error:", error);
-            const errMsg = error.response?.data?.message || 'Voting failed';
-            setMessage({ type: 'error', text: errMsg });
+            // Handle user rejecting signature
+            if (error.code === 4001 || error.info?.error?.code === 4001) { // Ethers/MetaMask user rejection
+                setMessage({ type: 'error', text: 'Signature rejected. Vote processing cancelled.' });
+            } else {
+                const errMsg = error.response?.data?.message || 'Voting failed';
+                setMessage({ type: 'error', text: errMsg });
 
-            if (error.response?.status === 403) {
-                setHasVoted(true); // If backend says forbidden (already voted), update UI
+                if (error.response?.status === 403) {
+                    setHasVoted(true); // If backend says forbidden (already voted), update UI
+                }
             }
         } finally {
             setVoting(false);
@@ -127,6 +175,24 @@ const Dashboard = () => {
                         ? "Your vote has been securely recorded. You may now log out."
                         : "Select a candidate below. This action is irreversible."}
                 </p>
+
+                {!walletAddress && !hasVoted && (
+                    <div className="mt-6">
+                        <button
+                            onClick={connectWallet}
+                            disabled={isConnecting}
+                            className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-full shadow-lg transform transition hover:scale-105 flex items-center gap-2 mx-auto"
+                        >
+                            {isConnecting ? "Connecting..." : "Connect Wallet to Vote"}
+                        </button>
+                        <p className="text-xs text-gray-500 mt-2">Wallet signature required for authorization.</p>
+                    </div>
+                )}
+                {walletAddress && !hasVoted && (
+                    <p className="text-sm text-green-400 mt-4 font-mono">
+                        Connected: {walletAddress.substring(0, 6)}...{walletAddress.substring(walletAddress.length - 4)}
+                    </p>
+                )}
             </div>
 
             {message && (
