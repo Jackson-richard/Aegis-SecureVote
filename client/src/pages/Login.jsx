@@ -12,7 +12,6 @@ const Login = () => {
 
     const handleScanSuccess = async (decodedData) => {
         try {
-            // Dynamic base URL
             const baseUrl = `http://${window.location.hostname}:5000`;
 
             const { studentId, token } = decodedData;
@@ -29,12 +28,10 @@ const Login = () => {
 
             if (response.data.valid) {
                 const { student } = response.data;
-                // Store auth data
                 localStorage.setItem('studentId', student.id);
-                localStorage.setItem('token', token); // Use the QR token as the auth token
+                localStorage.setItem('token', token);
                 localStorage.setItem('studentName', student.name);
 
-                // Navigate to dashboard/voting
                 navigate('/dashboard');
             } else {
                 setError(response.data.message || "Verification failed");
@@ -46,7 +43,6 @@ const Login = () => {
     };
 
     const handleScanError = (errMsg) => {
-        // Only show critical errors, ignore scan misses
         if (errMsg === "Invalid QR Format") {
             setError("QR Code must contain valid Student JSON data");
         }
