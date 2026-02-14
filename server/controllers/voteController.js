@@ -1,6 +1,8 @@
 const crypto = require('crypto');
 const dataManager = require('../services/dataManager');
 
+const DEMO_MODE = true;
+
 const ELECTION_START_TIME = new Date('2026-02-13T10:00:00Z').getTime();
 const ELECTION_END_TIME = new Date('2026-02-14T10:00:00Z').getTime();
 
@@ -8,11 +10,14 @@ exports.castVote = async (req, res) => {
     const { studentId, token, candidateId, message: voteMessage, signature, walletAddress } = req.body;
 
     const currentTime = Date.now();
-    if (currentTime < ELECTION_START_TIME) {
-        return res.status(403).json({ success: false, message: "Election has not started yet." });
-    }
-    if (currentTime > ELECTION_END_TIME) {
-        return res.status(403).json({ success: false, message: "Election is closed." });
+
+    if (!DEMO_MODE) {
+        if (currentTime < ELECTION_START_TIME) {
+            return res.status(403).json({ success: false, message: "Election has not started yet." });
+        }
+        if (currentTime > ELECTION_END_TIME) {
+            return res.status(403).json({ success: false, message: "Election is closed." });
+        }
     }
 
     if (!studentId || !token || !candidateId) {
@@ -126,7 +131,8 @@ exports.verifyProof = (req, res) => {
             valid: true,
             timestamp: record.timestamp,
             actionType: record.actionType,
-            walletAddress: record.walletAddress
+            walletAddress: record.walletAddress,
+            proofId: record.proofId
         });
     } else {
         res.json({
@@ -140,4 +146,22 @@ exports.getAuditLog = (req, res) => {
     const db = dataManager.readDB();
     const logs = db.auditLogs || [];
     res.json(logs);
+};
+
+exports.getElectionStatus = (req, res) => {
+    const currentTime = Date.now();
+    let status = 'ONGOING';
+
+    if (currentTime < ELECTION_START_TIME) {
+        status = 'UPCOMING';
+    } else if (currentTime > ELECTION_END_TIME) {
+        status = 'CLOSED';
+    }
+
+    res.json({
+        status: status,
+        demoMode: DEMO_MODE,
+        startTime: ELECTION_START_TIME,
+        endTime: ELECTION_END_TIME
+    });
 };

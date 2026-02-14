@@ -11,14 +11,24 @@ const seedData = {
         { id: "CSE2024007", token: "TOKEN_ETA_404", used: false, name: "Grace Green" },
         { id: "CSE2024008", token: "TOKEN_THETA_505", used: false, name: "Hank Hill" },
         { id: "CSE2024009", token: "TOKEN_IOTA_606", used: false, name: "Ivy Blue" },
-        { id: "CSE2024010", token: "TOKEN_KAPPA_707", used: false, name: "Jack Red" }
+        { id: "CSE2024010", token: "TOKEN_KAPPA_707", used: false, name: "Jack Red" },
+        { id: "IT2024011", token: "TOKEN_IT_001", used: false, name: "Arjun Kumar" },
+        { id: "IT2024012", token: "TOKEN_IT_002", used: false, name: "Meera Nair" },
+        { id: "IT2024013", token: "TOKEN_IT_003", used: false, name: "Rohan Patel" },
+        { id: "IT2024014", token: "TOKEN_IT_004", used: false, name: "Sneha Iyer" },
+        { id: "IT2024015", token: "TOKEN_IT_005", used: false, name: "Vikram Singh" },
+        { id: "IT2024016", token: "TOKEN_IT_006", used: false, name: "Ananya Das" },
+        { id: "IT2024017", token: "TOKEN_IT_007", used: false, name: "Karthik Rao" },
+        { id: "IT2024018", token: "TOKEN_IT_008", used: false, name: "Devadharshini.C" },
+        { id: "IT2024019", token: "TOKEN_IT_009", used: false, name: "Jison" },
+        { id: "IT2024020", token: "TOKEN_IT_010", used: false, name: "Neha Gupta" }
     ],
     candidates: [
         {
             id: 1,
             name: "Ivanvo",
-            symbol: "whistle", // Using text representation for logic or mapping if needed, but UI can use icon
-            symbolChar: "🏁", // Fallback or direct char
+            symbol: "whistle",
+            symbolChar: "🏁",
             moto: "Discipline. Progress. Transparency.",
             department: "CSE",
             year: "3rd Year",

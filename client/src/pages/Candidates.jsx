@@ -49,31 +49,40 @@ const Candidates = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="bg-gray-900/50 border border-gray-800 rounded-2xl p-6 hover:border-indigo-500/30 transition-all shadow-xl group"
+                        whileHover={{ y: -5 }}
+                        className="bg-gray-900/50 border border-gray-800 rounded-2xl p-6 hover:shadow-2xl hover:shadow-indigo-500/20 hover:border-indigo-500/50 transition-all duration-300 group relative overflow-hidden"
                     >
-                        <div className="h-48 bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-xl mb-6 flex flex-col items-center justify-center p-4 border border-gray-700/30 group-hover:bg-gray-800/80 transition-colors">
-                            <span className="text-6xl mb-4 transform group-hover:scale-110 transition-transform duration-300">
-                                {candidate.symbolChar || "👤"}
-                            </span>
-                            <span className="text-xs font-mono text-gray-500 uppercase tracking-widest">Symbol: {candidate.symbol || "Icon"}</span>
+                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                        <div className="flex flex-col items-center mb-6 relative z-10">
+                            <div className="w-32 h-32 rounded-full p-1 bg-gradient-to-br from-gray-700 to-gray-800 group-hover:from-indigo-400 group-hover:to-purple-500 transition-all duration-300 mb-4 shadow-lg group-hover:shadow-indigo-500/30">
+                                <img
+                                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(candidate.name)}&background=random&color=fff&size=128&font-size=0.4`}
+                                    alt={candidate.name}
+                                    className="w-full h-full rounded-full object-cover border-4 border-gray-900"
+                                />
+                            </div>
+                            <div className="text-xs font-mono text-gray-500 uppercase tracking-widest bg-gray-900/80 px-3 py-1 rounded-full border border-gray-800">
+                                Symbol: {candidate.symbol || "Icon"}
+                            </div>
                         </div>
 
-                        <div className="space-y-4">
+                        <div className="space-y-4 relative z-10 text-center">
                             <div>
-                                <h3 className="text-2xl font-bold text-white mb-1 group-hover:text-indigo-400 transition-colors">
+                                <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-indigo-300 transition-colors">
                                     {candidate.name}
                                 </h3>
-                                <div className="flex items-center gap-2 text-sm">
-                                    <span className="px-2 py-1 bg-indigo-900/30 text-indigo-300 rounded-md border border-indigo-500/20">
+                                <div className="flex items-center justify-center gap-2 text-sm">
+                                    <span className="px-3 py-1 bg-indigo-900/30 text-indigo-300 rounded-full border border-indigo-500/20 text-xs font-medium">
                                         {candidate.department}
                                     </span>
-                                    <span className="text-gray-500">•</span>
-                                    <span className="text-gray-400">{candidate.year}</span>
+                                    <span className="text-gray-600">•</span>
+                                    <span className="text-gray-400 text-xs">{candidate.year}</span>
                                 </div>
                             </div>
 
-                            <div className="pt-4 border-t border-gray-800">
-                                <p className="text-gray-300 italic">"{candidate.moto}"</p>
+                            <div className="pt-4 border-t border-gray-800/50">
+                                <p className="text-gray-300 italic text-sm leading-relaxed">"{candidate.moto}"</p>
                             </div>
                         </div>
                     </motion.div>

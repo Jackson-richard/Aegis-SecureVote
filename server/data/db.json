@@ -9,7 +9,7 @@
     {
       "id": "CSE2024002",
       "token": "TOKEN_BETA_456",
-      "used": true,
+      "used": false,
       "name": "Bob Smith"
     },
     {
@@ -27,9 +27,8 @@
     {
       "id": "CSE2024005",
       "token": "TOKEN_EPSILON_202",
-      "used": true,
-      "name": "Eve White",
-      "walletAddress": "0x5cc101a64B619e01d5eA900E3587F7Ed96293857"
+      "used": false,
+      "name": "Eve White"
     },
     {
       "id": "CSE2024006",
@@ -58,9 +57,68 @@
     {
       "id": "CSE2024010",
       "token": "TOKEN_KAPPA_707",
-      "used": true,
-      "name": "Jack Red",
-      "walletAddress": "0x5cc101a64B619e01d5eA900E3587F7Ed96293857"
+      "used": false,
+      "name": "Jack Red"
+    },
+    {
+      "id": "IT2024011",
+      "token": "TOKEN_IT_001",
+      "used": false,
+      "name": "Arjun Kumar"
+    },
+    {
+      "id": "IT2024012",
+      "token": "TOKEN_IT_002",
+      "used": false,
+      "name": "Meera Nair"
+    },
+    {
+      "id": "IT2024013",
+      "token": "TOKEN_IT_003",
+      "used": false,
+      "name": "Rohan Patel"
+    },
+    {
+      "id": "IT2024014",
+      "token": "TOKEN_IT_004",
+      "used": false,
+      "name": "Sneha Iyer"
+    },
+    {
+      "id": "IT2024015",
+      "token": "TOKEN_IT_005",
+      "used": false,
+      "name": "Vikram Singh"
+    },
+    {
+      "id": "IT2024016",
+      "token": "TOKEN_IT_006",
+      "used": false,
+      "name": "Ananya Das"
+    },
+    {
+      "id": "IT2024017",
+      "token": "TOKEN_IT_007",
+      "used": false,
+      "name": "Karthik Rao"
+    },
+    {
+      "id": "IT2024018",
+      "token": "TOKEN_IT_008",
+      "used": false,
+      "name": "Devadharshini.C"
+    },
+    {
+      "id": "IT2024019",
+      "token": "TOKEN_IT_009",
+      "used": false,
+      "name": "Jison"
+    },
+    {
+      "id": "IT2024020",
+      "token": "TOKEN_IT_010",
+      "used": false,
+      "name": "Neha Gupta"
     }
   ],
   "candidates": [
@@ -82,7 +140,7 @@
       "moto": "Green campus, smart future.",
       "department": "ECE",
       "year": "3rd Year",
-      "votes": 2
+      "votes": 0
     },
     {
       "id": 3,
@@ -92,47 +150,8 @@
       "moto": "Innovation for every student.",
       "department": "MECH",
       "year": "4th Year",
-      "votes": 1
+      "votes": 0
     }
   ],
-  "votes": [
-    {
-      "candidateId": 3,
-      "timestamp": "2026-02-12T17:49:38.676Z",
-      "proofId": "9ed98505da443f53667a5378602b4234ca2991508a5981a58d26094f7fdaa88b"
-    },
-    {
-      "candidateId": 2,
-      "timestamp": "2026-02-13T11:58:18.726Z",
-      "proofId": "310cc064c66a5f6c1a77975084dbc2f9727f82d63b19dd803f68edce20ab2612"
-    },
-    {
-      "candidateId": 2,
-      "timestamp": "2026-02-13T12:04:04.040Z",
-      "proofId": "2a7e5066d215746b1b8718e784037be0c2e7fd344429147d1f97c36172b197e9"
-    }
-  ],
-  "auditLogs": [
-    {
-      "proofId": "9ed98505da443f53667a5378602b4234ca2991508a5981a58d26094f7fdaa88b",
-      "timestamp": "2026-02-12T17:49:38.676Z",
-      "actionType": "VOTE_CAST",
-      "actionId": "d2ea7690-074b-4ce6-b626-ae57770237cb",
-      "walletAddress": "0x5cc101a64B619e01d5eA900E3587F7Ed96293857"
-    },
-    {
-      "proofId": "310cc064c66a5f6c1a77975084dbc2f9727f82d63b19dd803f68edce20ab2612",
-      "timestamp": "2026-02-13T11:58:18.726Z",
-      "actionType": "VOTE_CAST",
-      "actionId": "92eeb5da-0341-4a9f-be4a-38fd91344907",
-      "walletAddress": "0x5cc101a64B619e01d5eA900E3587F7Ed96293857"
-    },
-    {
-      "proofId": "2a7e5066d215746b1b8718e784037be0c2e7fd344429147d1f97c36172b197e9",
-      "timestamp": "2026-02-13T12:04:04.040Z",
-      "actionType": "VOTE_CAST",
-      "actionId": "5693bd8d-3e99-4ffa-baa6-bbeb8bcb8466",
-      "walletAddress": "0x5cc101a64B619e01d5eA900E3587F7Ed96293857"
-    }
-  ]
+  "votes": []
 }

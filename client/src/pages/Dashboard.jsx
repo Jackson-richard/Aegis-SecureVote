@@ -12,6 +12,8 @@ const Dashboard = () => {
     const [message, setMessage] = useState(null);
     const [hasVoted, setHasVoted] = useState(false);
     const [electionStatus, setElectionStatus] = useState('LOADING');
+    const [demoMode, setDemoMode] = useState(false);
+    const [realStatus, setRealStatus] = useState('');
 
     const [walletAddress, setWalletAddress] = useState(null);
     const [isConnecting, setIsConnecting] = useState(false);
@@ -33,29 +35,27 @@ const Dashboard = () => {
         checkBindingStatus();
     }, [token, studentId, navigate]);
 
-    const checkElectionStatus = () => {
-        const ELECTION_START_TIME = new Date('2026-02-13T10:00:00Z').getTime();
-        const ELECTION_END_TIME = new Date('2026-02-14T10:00:00Z').getTime();
-        const now = Date.now();
+    const checkElectionStatus = async () => {
+        try {
+            const baseUrl = `http://${window.location.hostname}:5000`;
+            const response = await axios.get(`${baseUrl}/api/status`);
 
-        if (now < ELECTION_START_TIME) {
-            setElectionStatus('UPCOMING');
-        } else if (now > ELECTION_END_TIME) {
+            const { status, demoMode } = response.data;
+            setRealStatus(status);
+            setDemoMode(demoMode);
+
+            if (demoMode) {
+                setElectionStatus('ONGOING');
+            } else {
+                setElectionStatus(status);
+            }
+        } catch (error) {
+            console.error(error);
             setElectionStatus('CLOSED');
-        } else {
-            setElectionStatus('ONGOING');
         }
     };
 
     const checkBindingStatus = async () => {
-        // In a real app, we'd check this from the backend or local storage if persisted
-        // For now we assume if they have a wallet connected and we verify it on vote, it's fine
-        // But the requirement is explicit binding.
-        // We'll trust the user flow: Connect -> Bind -> Vote.
-        // If they reload, we need to check if they are bound.
-        // We can add an endpoint or just rely on the vote failure if not bound.
-        // For UI polish, let's assume not bound unless we did it this session or check an API.
-        // Let's add a quick check via verify-qr which returns walletBound status.
         try {
             const baseUrl = `http://${window.location.hostname}:5000`;
             const response = await axios.post(`${baseUrl}/api/auth/verify-qr`, { studentId, token });
@@ -74,7 +74,7 @@ const Dashboard = () => {
             const response = await axios.get(`${baseUrl}/api/candidates`);
             setCandidates(response.data);
         } catch (error) {
-            console.error('Error fetching candidates:', error);
+            console.error(error);
             setMessage({ type: 'error', text: "Failed to load candidates." });
         } finally {
             setLoading(false);
@@ -94,14 +94,13 @@ const Dashboard = () => {
             const address = await signer.getAddress();
             setWalletAddress(address);
 
-            // Check if this wallet is the bound one (if already bound)
             if (isBound && address.toLowerCase() !== walletAddress?.toLowerCase()) {
                 setMessage({ type: 'error', text: "Connected wallet does not match the bound wallet for this student." });
             } else {
                 setMessage({ type: 'success', text: "Wallet connected." });
             }
         } catch (err) {
-            console.error("Wallet connection error:", err);
+            console.error(err);
             setMessage({ type: 'error', text: "Failed to connect wallet." });
         } finally {
             setIsConnecting(false);
@@ -115,7 +114,6 @@ const Dashboard = () => {
 
         try {
             const { ethers } = await import('ethers');
-            // Unique binding message
             const nonce = crypto.randomUUID();
             const timestamp = new Date().toISOString();
             const message = `BIND_WALLET\nstudentId=${studentId}\ntimestamp=${timestamp}\nnonce=${nonce}`;
@@ -138,7 +136,7 @@ const Dashboard = () => {
                 setMessage({ type: 'success', text: "Wallet successfully bound to Student ID!" });
             }
         } catch (error) {
-            console.error("Binding error:", error);
+            console.error(error);
             const errMsg = error.response?.data?.message || 'Wallet binding failed';
             setMessage({ type: 'error', text: errMsg });
         } finally {
@@ -204,7 +202,7 @@ const Dashboard = () => {
             }
 
         } catch (error) {
-            console.error("Vote error:", error);
+            console.error(error);
             if (error.code === 4001 || error.info?.error?.code === 4001) {
                 setMessage({ type: 'error', text: 'Signature rejected. Vote processing cancelled.' });
             } else {
@@ -231,6 +229,41 @@ const Dashboard = () => {
         }
     };
 
+    const getStatusBadge = () => {
+        if (demoMode) {
+            return (
+                <div className="px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                    <Clock className="w-4 h-4" />
+                    Demo Mode Active
+                </div>
+            );
+        }
+
+        switch (realStatus) {
+            case 'ONGOING':
+                return (
+                    <div className="px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 bg-green-500/20 text-green-400 border border-green-500/30">
+                        <Clock className="w-4 h-4" />
+                        Election Live
+                    </div>
+                );
+            case 'UPCOMING':
+                return (
+                    <div className="px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                        <Clock className="w-4 h-4" />
+                        Election Upcoming
+                    </div>
+                );
+            default:
+                return (
+                    <div className="px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 bg-red-500/20 text-red-400 border border-red-500/30">
+                        <Clock className="w-4 h-4" />
+                        Election Closed
+                    </div>
+                );
+        }
+    };
+
     if (loading) return <div className="text-center py-20 text-gray-400">Loading election data...</div>;
 
     return (
@@ -252,14 +285,7 @@ const Dashboard = () => {
                     </div>
                 </div>
                 <div className="flex items-center gap-4">
-                    <div className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 ${electionStatus === 'ONGOING' ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
-                            electionStatus === 'UPCOMING' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
-                                'bg-red-500/20 text-red-400 border border-red-500/30'
-                        }`}>
-                        <Clock className="w-4 h-4" />
-                        {electionStatus === 'ONGOING' ? 'Election Live' :
-                            electionStatus === 'UPCOMING' ? 'Election Upcoming' : 'Election Closed'}
-                    </div>
+                    {getStatusBadge()}
                     <button
                         onClick={handleLogout}
                         className="bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
@@ -350,8 +376,14 @@ const Dashboard = () => {
                             whileHover={{ scale: 1.02 }}
                             className="bg-gray-900/50 border border-gray-800 rounded-2xl p-6 hover:border-indigo-500/50 transition-all shadow-xl"
                         >
-                            <div className="h-40 bg-gradient-to-br from-indigo-900/20 to-purple-900/20 rounded-xl mb-6 flex flex-col items-center justify-center p-4">
-                                <span className="text-6xl mb-2 drop-shadow-lg">{candidate.symbolChar || "👤"}</span>
+                            <div className="flex flex-col items-center mb-6">
+                                <div className="w-24 h-24 rounded-full p-1 bg-gradient-to-br from-gray-700 to-gray-800 mb-3 shadow-lg">
+                                    <img
+                                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(candidate.name)}&background=random&color=fff&size=128&font-size=0.4`}
+                                        alt={candidate.name}
+                                        className="w-full h-full rounded-full object-cover border-4 border-gray-900"
+                                    />
+                                </div>
                                 <div className="flex gap-2 text-xs font-mono text-indigo-300 bg-indigo-900/40 px-3 py-1 rounded-full border border-indigo-500/20">
                                     <span>{candidate.department}</span>
                                     <span>•</span>
@@ -365,12 +397,13 @@ const Dashboard = () => {
                             <button
                                 onClick={() => handleVote(candidate.id)}
                                 disabled={voting}
-                                className={`w-full py-3 rounded-xl font-bold transition-all ${voting
-                                    ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                                    : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
+                                className={`w-full py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${voting
+                                    ? 'bg-gray-800 text-gray-500 cursor-not-allowed border border-gray-700'
+                                    : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20 hover:scale-[1.02] active:scale-[0.98]'
                                     }`}
                             >
-                                {voting ? 'Processing...' : 'Vote For Candidate'}
+                                {voting && <span className="w-4 h-4 border-2 border-gray-500 border-t-white rounded-full animate-spin"></span>}
+                                {voting ? 'Processing Vote...' : 'Vote For Candidate'}
                             </button>
                         </motion.div>
                     ))}
