@@ -9,8 +9,9 @@
     {
       "id": "CSE2024002",
       "token": "TOKEN_BETA_456",
-      "used": false,
-      "name": "Bob Smith"
+      "used": true,
+      "name": "Bob Smith",
+      "walletAddress": "0x5cc101a64B619e01d5eA900E3587F7Ed96293857"
     },
     {
       "id": "CSE2024003",
@@ -87,8 +88,9 @@
     {
       "id": "IT2024015",
       "token": "TOKEN_IT_005",
-      "used": false,
-      "name": "Vikram Singh"
+      "used": true,
+      "name": "Vikram Singh",
+      "walletAddress": "0x5cc101a64B619e01d5eA900E3587F7Ed96293857"
     },
     {
       "id": "IT2024016",
@@ -140,7 +142,7 @@
       "moto": "Green campus, smart future.",
       "department": "ECE",
       "year": "3rd Year",
-      "votes": 0
+      "votes": 1
     },
     {
       "id": 3,
@@ -150,8 +152,35 @@
       "moto": "Innovation for every student.",
       "department": "MECH",
       "year": "4th Year",
-      "votes": 0
+      "votes": 1
     }
   ],
-  "votes": []
+  "votes": [
+    {
+      "candidateId": 3,
+      "timestamp": "2026-02-15T08:14:16.828Z",
+      "proofId": "b7180a6d54cacabe4757ba5b32b85dd0230eb707ea2e2e01c42e87d0c78d089c"
+    },
+    {
+      "candidateId": 2,
+      "timestamp": "2026-02-15T08:17:06.573Z",
+      "proofId": "d2ac768d9be0b24b2b46d86114ccaa15472a839ab5fc98c373e1b165d3a60db3"
+    }
+  ],
+  "auditLogs": [
+    {
+      "proofId": "b7180a6d54cacabe4757ba5b32b85dd0230eb707ea2e2e01c42e87d0c78d089c",
+      "timestamp": "2026-02-15T08:14:16.828Z",
+      "actionType": "VOTE_CAST",
+      "actionId": "43cd0a59-8db1-41ae-b10b-35ee7968d3fc",
+      "walletAddress": "0x5cc101a64B619e01d5eA900E3587F7Ed96293857"
+    },
+    {
+      "proofId": "d2ac768d9be0b24b2b46d86114ccaa15472a839ab5fc98c373e1b165d3a60db3",
+      "timestamp": "2026-02-15T08:17:06.573Z",
+      "actionType": "VOTE_CAST",
+      "actionId": "e6552340-a9ca-497f-8afb-c5d628eb46c5",
+      "walletAddress": "0x5cc101a64B619e01d5eA900E3587F7Ed96293857"
+    }
+  ]
 }

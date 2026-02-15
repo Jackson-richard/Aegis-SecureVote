@@ -7,7 +7,7 @@ const DB_PATH = path.join(__dirname, 'server/data/db.json');
 async function runVerification() {
     console.log("🚀 Starting Verification Script...");
 
-    // 1. Read DB to find a valid student and candidate
+    
     try {
         const dbRaw = fs.readFileSync(DB_PATH, 'utf-8');
         const db = JSON.parse(dbRaw);
@@ -23,7 +23,7 @@ async function runVerification() {
         console.log(`👤 Testing with Student: ${student.name} (${student.id})`);
         console.log(`🗳️ Voting for Candidate: ${candidate.name} (${candidate.id})`);
 
-        // 2. Cast Vote
+        
         console.log("\n📡 Sending Vote Request...");
         const voteResponse = await fetch(`${API_URL}/api/cast`, {
             method: 'POST',
@@ -47,7 +47,7 @@ async function runVerification() {
                 return;
             }
 
-            // 3. Verify Proof
+            
             console.log("\n🔍 Verifying Proof...");
             const verifyResponse = await fetch(`${API_URL}/api/verify/${proofId}`);
             const verifyData = await verifyResponse.json();
@@ -60,7 +60,7 @@ async function runVerification() {
                 console.error("❌ Proof Verification Failed:", verifyData.message);
             }
 
-            // 4. Verify Audit Log
+            
             console.log("\n📜 Checking Audit Log...");
             const auditResponse = await fetch(`${API_URL}/api/audit-log`);
             const auditLog = await auditResponse.json();

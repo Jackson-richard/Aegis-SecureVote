@@ -7,7 +7,6 @@ const QRScanner = ({ onScanSuccess, onScanError }) => {
     const [streamActive, setStreamActive] = useState(false);
     const scannerRef = useRef(null);
 
-    // Manual Camera Activation
     const startCamera = async () => {
         try {
             console.log("Requesting camera access...");
@@ -18,13 +17,13 @@ const QRScanner = ({ onScanSuccess, onScanError }) => {
             if (videoRef.current) {
                 console.log("Attaching stream to video element");
                 videoRef.current.srcObject = stream;
-                videoRef.current.setAttribute("playsinline", true); // iOS compatibility
+                videoRef.current.setAttribute("playsinline", true); 
 
                 await videoRef.current.play();
                 setStreamActive(true);
                 setScanning(true);
 
-                // Initialize Scanner ONLY after stream is valid
+                
                 initializeScanner(stream);
             }
         } catch (err) {
@@ -36,33 +35,21 @@ const QRScanner = ({ onScanSuccess, onScanError }) => {
     const initializeScanner = (stream) => {
         if (scannerRef.current) return;
 
-        // We use Html5Qrcode class to scan the video element or frames
         const html5QrCode = new Html5Qrcode("reader-hidden");
         scannerRef.current = html5QrCode;
 
-        // Since we are managing the video manually as requested, we need to feed data to the scanner.
-        // Html5Qrcode doesn't easily accept an external video element for continuous scanning 
-        // without taking over the UI. 
-        // WORKAROUND: We use an interval to "scan" the video frame using the library's compute.
-        // Note: This is a manual implementation of what the library usually does.
+       
 
         const scanLoop = setInterval(() => {
             if (!videoRef.current || videoRef.current.paused || videoRef.current.ended) return;
 
-            // Create a temporary canvas to capture frame
             const canvas = document.createElement("canvas");
             canvas.width = videoRef.current.videoWidth;
             canvas.height = videoRef.current.videoHeight;
             const ctx = canvas.getContext("2d");
             ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
 
-            // Use the library to scan the canvas/image
-            // html5-qrcode's scanFileV2 expects a File or Blob. 
-            // This might be slow. 
-            // ALTERNATIVE: Use the library's start() method BUT we need to respect the "Manual Video" constraint.
-            // If we use start(), it creates its own video.
-
-            // Let's try to get the blob and scan it. 
+            
             canvas.toBlob(async (blob) => {
                 if (!blob) return;
                 try {
@@ -76,9 +63,8 @@ const QRScanner = ({ onScanSuccess, onScanError }) => {
                 }
             }, 'image/png');
 
-        }, 500); // Scan every 500ms (2fps) to avoid lag
+        }, 500);
 
-        // Store interval to clear later
         scannerRef.current.interval = scanLoop;
     };
 
@@ -114,7 +100,7 @@ const QRScanner = ({ onScanSuccess, onScanError }) => {
 
     return (
         <div className="w-full max-w-md mx-auto flex flex-col items-center">
-            {/* Hidden div for Html5Qrcode constructor requirement */}
+           
             <div id="reader-hidden" style={{ display: 'none' }}></div>
 
             <div className="relative w-full aspect-square bg-black rounded-xl overflow-hidden mb-4 border border-gray-700">
@@ -130,7 +116,6 @@ const QRScanner = ({ onScanSuccess, onScanError }) => {
                     muted
                 />
 
-                {/* Overlay guides */}
                 {streamActive && (
                     <div className="absolute inset-0 border-2 border-indigo-500/50 m-8 rounded-lg pointer-events-none animate-pulse"></div>
                 )}

@@ -8,7 +8,7 @@ const Results = () => {
 
     useEffect(() => {
         fetchResults();
-        const interval = setInterval(fetchResults, 5000); // Polling for real-time updates
+        const interval = setInterval(fetchResults, 5000); 
         return () => clearInterval(interval);
     }, []);
 

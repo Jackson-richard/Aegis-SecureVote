@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 const SecurityExplainer = () => {
     return (
         <div className="mt-16 space-y-16 text-gray-300">
-            {/* Architecture Diagram */}
+            
             <section className="bg-gray-900/50 border border-gray-800 rounded-2xl p-8 shadow-xl">
                 <div className="flex items-center gap-3 mb-8">
                     <Database className="w-8 h-8 text-indigo-400" />
@@ -13,7 +13,7 @@ const SecurityExplainer = () => {
                 </div>
 
                 <div className="relative flex flex-col md:flex-row justify-between items-center gap-8 md:gap-4 p-4">
-                    {/* User Step */}
+                    
                     <div className="flex flex-col items-center text-center z-10 w-full md:w-auto">
                         <div className="bg-blue-500/10 p-4 rounded-full border border-blue-500/30 mb-3">
                             <Smartphone className="w-8 h-8 text-blue-400" />
@@ -22,13 +22,12 @@ const SecurityExplainer = () => {
                         <p className="text-xs text-gray-400 max-w-[150px]">QR Login & Choice</p>
                     </div>
 
-                    {/* Arrow 1 */}
                     <div className="hidden md:flex flex-1 h-0.5 bg-gray-700 relative">
                         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-full text-xs text-gray-500 pb-2">JWT Auth</div>
                         <div className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-1 border-t-4 border-b-4 border-l-8 border-transparent border-l-gray-700"></div>
                     </div>
 
-                    {/* Backend Step */}
+                  
                     <div className="flex flex-col items-center text-center z-10 w-full md:w-auto">
                         <div className="bg-indigo-500/10 p-4 rounded-full border border-indigo-500/30 mb-3">
                             <Server className="w-8 h-8 text-indigo-400" />
@@ -37,13 +36,12 @@ const SecurityExplainer = () => {
                         <p className="text-xs text-gray-400 max-w-[150px]">Eligibility Check</p>
                     </div>
 
-                    {/* Arrow 2 */}
                     <div className="hidden md:flex flex-1 h-0.5 bg-gray-700 relative">
                         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-full text-xs text-gray-500 pb-2">Vote Signing</div>
                         <div className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-1 border-t-4 border-b-4 border-l-8 border-transparent border-l-gray-700"></div>
                     </div>
 
-                    {/* Wallet Step */}
+                  
                     <div className="flex flex-col items-center text-center z-10 w-full md:w-auto">
                         <div className="bg-purple-500/10 p-4 rounded-full border border-purple-500/30 mb-3">
                             <Lock className="w-8 h-8 text-purple-400" />
@@ -52,13 +50,13 @@ const SecurityExplainer = () => {
                         <p className="text-xs text-gray-400 max-w-[150px]">MetaMask Sig (SHA-256)</p>
                     </div>
 
-                    {/* Arrow 3 */}
+                 
                     <div className="hidden md:flex flex-1 h-0.5 bg-gray-700 relative">
                         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-full text-xs text-gray-500 pb-2">Proof Gen</div>
                         <div className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-1 border-t-4 border-b-4 border-l-8 border-transparent border-l-gray-700"></div>
                     </div>
 
-                    {/* Verification Step */}
+                   
                     <div className="flex flex-col items-center text-center z-10 w-full md:w-auto">
                         <div className="bg-green-500/10 p-4 rounded-full border border-green-500/30 mb-3">
                             <Shield className="w-8 h-8 text-green-400" />
@@ -69,7 +67,7 @@ const SecurityExplainer = () => {
                 </div>
             </section>
 
-            {/* Threat Model */}
+         
             <section className="bg-gray-900/50 border border-gray-800 rounded-2xl p-8 shadow-xl">
                 <div className="flex items-center gap-3 mb-6">
                     <AlertTriangle className="w-8 h-8 text-yellow-500" />
@@ -116,7 +114,7 @@ const SecurityExplainer = () => {
             </section>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Replay Attack Info */}
+                
                 <section className="bg-gray-900/50 border border-gray-800 rounded-2xl p-8 shadow-xl">
                     <div className="flex items-center gap-3 mb-4">
                         <Fingerprint className="w-6 h-6 text-pink-400" />
@@ -140,7 +138,6 @@ const SecurityExplainer = () => {
                     </div>
                 </section>
 
-                {/* Scalability Info */}
                 <section className="bg-gray-900/50 border border-gray-800 rounded-2xl p-8 shadow-xl">
                     <div className="flex items-center gap-3 mb-4">
                         <Eye className="w-6 h-6 text-cyan-400" />

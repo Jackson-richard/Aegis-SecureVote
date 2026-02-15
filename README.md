@@ -1,6 +1,6 @@
-SecureVote – Cryptographically Verifiable Digital Voting System
+Aegis – Cryptographically Verifiable Digital Voting System
 
-SecureVote is a secure, transparent, and verifiable digital voting system designed for academic election demos.  
+Aegis is a secure, transparent, and verifiable digital voting system designed for academic election demos.  
 It combines traditional authentication (Student ID + Token) with modern cryptographic techniques and wallet-based authorization to ensure trust, integrity, and auditability.
 
 This project is built as a **demo-ready system** for project expos, focusing on **security concepts**, not real political elections.
@@ -15,13 +15,12 @@ Traditional digital voting systems suffer from:
 - No way for voters to independently verify their vote
 - Centralized trust in administrators
 
-SecureVote addresses these issues by introducing **cryptographic proof**, **wallet-based authorization**, and **verifiable audit logs**.
+Aegis addresses these issues by introducing **cryptographic proof**, **wallet-based authorization**, and **verifiable audit logs**.
 
 ---
 
 💡 Solution Overview
-
-SecureVote ensures that:
+Aegis ensures that:
 - Each student can vote **only once**
 - Every vote generates a **tamper-proof Proof ID**
 - Voters can independently verify that their vote exists
