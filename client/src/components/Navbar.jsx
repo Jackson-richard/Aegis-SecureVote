@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Vote, BarChart2, ScanLine, Users, ShieldCheck } from 'lucide-react';
 
-const Navbar = () => {
+const Navbar = ({connectWallet, walletAddress}) => {
 
     return (
         <nav className="bg-gray-900 border-b border-gray-800">
@@ -30,6 +30,14 @@ const Navbar = () => {
                             <BarChart2 className="w-4 h-4" />
                             Results
                         </Link>
+                        <button
+  onClick={connectWallet}
+  className="px-4 py-2 bg-blue-600 rounded text-white"
+>
+  {walletAddress
+    ? `Wallet: ${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+    : "Connect Wallet"}
+</button>
                     </div>
                 </div>
             </div>

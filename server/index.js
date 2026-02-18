@@ -1,3 +1,4 @@
+const { db } = require("./services/firebase");
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
@@ -18,7 +19,11 @@ app.use('/api', voteRoutes);
 app.get('/', (req, res) => {
     res.send('Voting App Backend is running');
 });
-
+db.collection("students")
+  .limit(1)
+  .get()
+  .then(() => console.log("🔥 Firebase connected successfully"))
+  .catch(err => console.error("❌ Firebase error:", err));
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
