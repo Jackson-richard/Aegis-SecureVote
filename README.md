@@ -39,7 +39,7 @@ Aegis ensures that:
 Backend
 - Node.js
 - Express.js
-- JSON-based data storage (demo purpose)
+- Firebase
 
 Cryptography & Web3
 - SHA-256 hashing
