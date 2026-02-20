@@ -118,3 +118,5 @@ For every vote:
 6. Tampering attempt → verification fails
 
 ---
+
+Developed by Jackson Richard J
